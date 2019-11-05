@@ -5,7 +5,7 @@ import (
 	"os"
 
 	"github.com/edualb/igit/git"
-	local "github.com/edualb/igit/local"
+	"github.com/edualb/igit/local"
 	"github.com/edualb/igit/service"
 	"github.com/edualb/igit/util"
 	"github.com/joho/godotenv"
