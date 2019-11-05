@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/edualb/igit/git"
+	local "github.com/edualb/igit/local"
 	"github.com/edualb/igit/service"
 	"github.com/edualb/igit/util"
 	"github.com/joho/godotenv"
@@ -58,17 +59,18 @@ func commands() {
 					return
 				}
 				storeCredential(user, pass)
+				util.Info("User was created.")
 			},
 		},
 	}
 }
 
 func storeCredential(username, password string) {
-	auth := &git.Credentials{
+	localCredential := &local.Credentials{
 		Username: username,
 		Password: password,
 	}
-	auth.Store()
+	localCredential.Store()
 }
 
 func release() {
