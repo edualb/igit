@@ -6,7 +6,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/edualb/go-generate-tag-ios-globo/util"
+	"github.com/edualb/igit/util"
 )
 
 func SetPodfileVersion(path, version string) {

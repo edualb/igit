@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/edualb/go-generate-tag-ios-globo/git"
-	"github.com/edualb/go-generate-tag-ios-globo/service"
-	"github.com/edualb/go-generate-tag-ios-globo/util"
+	"github.com/edualb/igit/git"
+	"github.com/edualb/igit/service"
+	"github.com/edualb/igit/util"
 	"github.com/joho/godotenv"
 	"github.com/urfave/cli"
 )
@@ -30,41 +30,76 @@ func info() {
 func commands() {
 	app.Commands = []cli.Command{
 		{
-			Name:    "release",
-			Aliases: []string{"r"},
+			Name:        "release",
+			Aliases:     []string{"r"},
+			Description: "Create a release in a project and create a folder for this release in a pods repository",
 			Action: func(c *cli.Context) {
 				if c.NArg() > 0 {
 					err := godotenv.Load(c.Args()[0])
 					util.CheckIfError(err)
 				} else {
-					util.InfoWarning("You need send the path of .env file in argument.")
+					util.InfoWarning("You need to send the path of .env file in argument.")
 					return
 				}
 				release()
+			},
+		},
+		{
+			Name:        "store-credential",
+			Aliases:     []string{"sc"},
+			Description: "Store credentials from git",
+			Action: func(c *cli.Context) {
+				user := ""
+				pass := ""
+				if c.NArg() > 1 {
+					user = c.Args()[0]
+					pass = c.Args()[1]
+				} else {
+					util.InfoWarning("You need to set your username and password.")
+					return
+				}
+				git.Store(user, pass)
+				password, err := git.GetPassword(user)
+				util.CheckIfError(err)
+				fmt.Println(fmt.Sprintf("password: %s", password))
 			},
 		},
 	}
 }
 
 func release() {
+	mainProject := &git.IGitRelease{
+		Path:        os.Getenv("PATH_PROJECT"),
+		Release:     os.Getenv("TAG_VERSION"),
+		BranchRef:   os.Getenv("REFERENCE_BRANCH"),
+		PodspecFile: os.Getenv("PODSPEC_FILE"),
+	}
+
 	util.Info(fmt.Sprintf("************************** %s **************************", os.Getenv("NAME")))
-	git.Stash(os.Getenv("PATH_PROJECT"))
-	git.Checkout(os.Getenv("PATH_PROJECT"), os.Getenv("REFERENCE_BRANCH"))
-	git.Pull(os.Getenv("PATH_PROJECT"))
-	git.CreateBranch(os.Getenv("PATH_PROJECT"), os.Getenv("TAG_VERSION"))
-	git.CreateRemoteBranch(os.Getenv("PATH_PROJECT"), os.Getenv("TAG_VERSION"))
-	service.SetPodfileVersion(os.Getenv("PATH_PODSPEC"), os.Getenv("TAG_VERSION"))
-	git.Add(os.Getenv("PATH_PROJECT"), os.Getenv("PODSPEC_FILE"))
-	git.Commit(os.Getenv("PATH_PROJECT"), os.Getenv("TAG_VERSION"))
-	git.Push(os.Getenv("PATH_PROJECT"))
+	mainProject.Stash()
+	mainProject.Checkout()
+	mainProject.Pull()
+	mainProject.CreateBranch()
+	mainProject.CreateRemoteBranch()
+	service.SetPodfileVersion(os.Getenv("PATH_PODSPEC"), mainProject.Release)
+	mainProject.Add()
+	mainProject.Commit()
+	mainProject.Push()
+
+	podsProject := &git.IGitRelease{
+		Path:        os.Getenv("PODS_PATH_PROJECT"),
+		Release:     os.Getenv("TAG_VERSION"),
+		BranchRef:   os.Getenv("PODS_REFERENCE_BRANCH"),
+		PodspecFile: os.Getenv("PODSPEC_FILE"),
+	}
 
 	util.Info("************************** PODS REPOSITORY **************************")
-	git.Stash(os.Getenv("PODS_PATH_PROJECT"))
-	git.Checkout(os.Getenv("PODS_PATH_PROJECT"), os.Getenv("PODS_REFERENCE_BRANCH"))
-	git.Pull(os.Getenv("PODS_PATH_PROJECT"))
+	podsProject.Stash()
+	podsProject.Checkout()
+	podsProject.Pull()
 	service.Mkdir(os.Getenv("PODS_PATH_FOLDER"))
 	service.Copy(os.Getenv("PATH_PODSPEC"), os.Getenv("PODS_PATH_FOLDER"))
 	git.Add(os.Getenv("PODS_PATH_PROJECT"), os.Getenv("PODS_PATH_PODSPEC"))
-	git.Commit(os.Getenv("PODS_PATH_PROJECT"), os.Getenv("TAG_VERSION"))
-	git.Push(os.Getenv("PODS_PATH_PROJECT"))
+	podsProject.Commit()
+	podsProject.Push()
 }

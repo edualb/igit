@@ -4,21 +4,37 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/edualb/go-generate-tag-ios-globo/util"
+	"github.com/edualb/igit/util"
 	"gopkg.in/src-d/go-git.v4"
 	"gopkg.in/src-d/go-git.v4/plumbing"
 	"gopkg.in/src-d/go-git.v4/plumbing/object"
 )
 
+// TODO: Replace ExecCommand to go-git.v4 lib
 func Stash(path string) {
 	util.Info("git stash")
 	err := util.ExecCommand(fmt.Sprintf("cd %s; git stash;", path))
 	util.CheckIfError(err)
 }
 
+// TODO: Replace ExecCommand to go-git.v4 lib
 func Pull(path string) {
 	util.Info("git pull")
 	err := util.ExecCommand(fmt.Sprintf("cd %s; git pull;", path))
+	util.CheckIfError(err)
+}
+
+// TODO: Replace ExecCommand to go-git.v4 lib
+func CreateRemoteBranch(path string, branch string) {
+	util.Info(fmt.Sprintf("git push --set-upstream origin %s", branch))
+	err := util.ExecCommand(fmt.Sprintf("cd %s; git push --set-upstream origin %s", path, branch))
+	util.CheckIfError(err)
+}
+
+// TODO: Replace ExecCommand to go-git.v4 lib
+func Push(path string) {
+	util.Info("git push")
+	err := util.ExecCommand(fmt.Sprintf("cd %s; git push", path))
 	util.CheckIfError(err)
 }
 
@@ -33,29 +49,23 @@ func Checkout(path string, branch string) {
 	util.CheckIfError(err)
 }
 
-func CreateBranch(path string, version string) {
+func CreateBranch(path string, branch string) {
 	r := getRepository(path)
 
 	headRef, err := r.Head()
 	util.CheckIfError(err)
 
-	branchName := plumbing.NewBranchReferenceName(fmt.Sprintf("release/%s", version))
+	branchName := plumbing.NewBranchReferenceName(branch)
 	worktree, err := r.Worktree()
 	util.CheckIfError(err)
 
-	util.Info(fmt.Sprintf("git checkout -b release/%s", version))
+	util.Info(fmt.Sprintf("git checkout -b %s", branch))
 
 	err = worktree.Checkout(&git.CheckoutOptions{
 		Hash:   headRef.Hash(),
 		Branch: branchName,
 		Create: true,
 	})
-	util.CheckIfError(err)
-}
-
-func CreateRemoteBranch(path string, version string) {
-	util.Info(fmt.Sprintf("git push --set-upstream origin release/%s", version))
-	err := util.ExecCommand(fmt.Sprintf("cd %s; git push --set-upstream origin release/%s", path, version))
 	util.CheckIfError(err)
 }
 
@@ -66,19 +76,13 @@ func Add(path string, file string) {
 	util.CheckIfError(err)
 }
 
-func Commit(path string, version string) {
+func Commit(path, message string) {
 	worktree := getWorktree(path)
-	util.Info(fmt.Sprintf("git commit -m  \"update to release/%s\"", version))
-	_, err := worktree.Commit(fmt.Sprintf("update to release/%s", version), &git.CommitOptions{
+	util.Info(fmt.Sprintf("git commit -m  \"%s\"", message))
+	_, err := worktree.Commit(message, &git.CommitOptions{
 		All:    true,
 		Author: &object.Signature{Name: "iGit", When: time.Now()},
 	})
-	util.CheckIfError(err)
-}
-
-func Push(path string) {
-	util.Info("git push")
-	err := util.ExecCommand(fmt.Sprintf("cd %s; git push", path))
 	util.CheckIfError(err)
 }
 
