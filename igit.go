@@ -75,7 +75,7 @@ func release() {
 		PodspecFile: os.Getenv("PODSPEC_FILE"),
 	}
 
-	util.Info(fmt.Sprintf("************************** %s **************************", os.Getenv("NAME")))
+	util.Info(fmt.Sprintf("* %s: ", os.Getenv("PROJECT_NAME")))
 	mainProject.Stash()
 	mainProject.Checkout()
 	mainProject.Pull()
@@ -93,13 +93,13 @@ func release() {
 		PodspecFile: os.Getenv("PODSPEC_FILE"),
 	}
 
-	util.Info("************************** PODS REPOSITORY **************************")
+	util.Info("* PODS REPOSITORY:")
 	podsProject.Stash()
 	podsProject.Checkout()
 	podsProject.Pull()
 	service.Mkdir(os.Getenv("PODS_PATH_FOLDER"))
 	service.Copy(os.Getenv("PATH_PODSPEC"), os.Getenv("PODS_PATH_FOLDER"))
-	git.Add(os.Getenv("PODS_PATH_PROJECT"), os.Getenv("PODS_PATH_PODSPEC"))
+	podsProject.AddPods(os.Getenv("PROJECT_NAME"))
 	podsProject.Commit()
 	podsProject.Push()
 }

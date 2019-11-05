@@ -11,34 +11,34 @@ import (
 )
 
 // TODO: Replace ExecCommand to go-git.v4 lib
-func Stash(path string) {
+func stash(path string) {
 	util.Info("git stash")
 	err := util.ExecCommand(fmt.Sprintf("cd %s; git stash;", path))
 	util.CheckIfError(err)
 }
 
 // TODO: Replace ExecCommand to go-git.v4 lib
-func Pull(path string) {
+func pull(path string) {
 	util.Info("git pull")
 	err := util.ExecCommand(fmt.Sprintf("cd %s; git pull;", path))
 	util.CheckIfError(err)
 }
 
 // TODO: Replace ExecCommand to go-git.v4 lib
-func CreateRemoteBranch(path string, branch string) {
+func createRemoteBranch(path string, branch string) {
 	util.Info(fmt.Sprintf("git push --set-upstream origin %s", branch))
 	err := util.ExecCommand(fmt.Sprintf("cd %s; git push --set-upstream origin %s", path, branch))
 	util.CheckIfError(err)
 }
 
 // TODO: Replace ExecCommand to go-git.v4 lib
-func Push(path string) {
+func push(path string) {
 	util.Info("git push")
 	err := util.ExecCommand(fmt.Sprintf("cd %s; git push", path))
 	util.CheckIfError(err)
 }
 
-func Checkout(path string, branch string) {
+func checkout(path string, branch string) {
 	worktree := getWorktree(path)
 
 	util.Info(fmt.Sprintf("git checkout %s", branch))
@@ -49,7 +49,7 @@ func Checkout(path string, branch string) {
 	util.CheckIfError(err)
 }
 
-func CreateBranch(path string, branch string) {
+func createBranch(path string, branch string) {
 	r := getRepository(path)
 
 	headRef, err := r.Head()
@@ -69,14 +69,14 @@ func CreateBranch(path string, branch string) {
 	util.CheckIfError(err)
 }
 
-func Add(path string, file string) {
+func add(path string, file string) {
 	worktree := getWorktree(path)
 	util.Info(fmt.Sprintf("git add %s", file))
 	_, err := worktree.Add(file)
 	util.CheckIfError(err)
 }
 
-func Commit(path, message string) {
+func commit(path, message string) {
 	worktree := getWorktree(path)
 	util.Info(fmt.Sprintf("git commit -m  \"%s\"", message))
 	_, err := worktree.Commit(message, &git.CommitOptions{

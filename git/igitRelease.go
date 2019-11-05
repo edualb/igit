@@ -12,33 +12,38 @@ type IGitRelease struct {
 }
 
 func (gitR *IGitRelease) Stash() {
-	Stash(gitR.Path)
+	stash(gitR.Path)
 }
 
 func (gitR *IGitRelease) Pull() {
-	Pull(gitR.Path)
+	pull(gitR.Path)
 }
 
 func (gitR *IGitRelease) CreateBranch() {
-	CreateBranch(gitR.Path, fmt.Sprintf("release/%s", gitR.Release))
+	createBranch(gitR.Path, fmt.Sprintf("release/%s", gitR.Release))
 }
 
 func (gitR *IGitRelease) CreateRemoteBranch() {
-	CreateRemoteBranch(gitR.Path, fmt.Sprintf("release/%s", gitR.Release))
+	createRemoteBranch(gitR.Path, fmt.Sprintf("release/%s", gitR.Release))
 }
 
 func (gitR *IGitRelease) Checkout() {
-	Checkout(gitR.Path, gitR.BranchRef)
+	checkout(gitR.Path, gitR.BranchRef)
 }
 
 func (gitR *IGitRelease) Commit() {
-	Commit(gitR.Path, fmt.Sprintf("update to release/%s", gitR.Release))
+	commit(gitR.Path, fmt.Sprintf("update to release/%s", gitR.Release))
 }
 
 func (gitR *IGitRelease) Push() {
-	Push(gitR.Path)
+	push(gitR.Path)
 }
 
 func (gitR *IGitRelease) Add() {
-	Add(gitR.Path, gitR.PodspecFile)
+	add(gitR.Path, gitR.PodspecFile)
+}
+
+func (gitR *IGitRelease) AddPods(projectName string) {
+	pathPodspecFile := fmt.Sprintf("%s/%s/%s", projectName, gitR.Release, gitR.PodspecFile)
+	add(gitR.Path, pathPodspecFile)
 }
