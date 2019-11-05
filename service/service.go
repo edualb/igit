@@ -41,3 +41,14 @@ func Mkdir(path string) {
 		util.CheckIfError(err)
 	}
 }
+
+// SOURCE: https://gist.github.com/novalagung/13c5c8f4d30e0c4bff27
+func CreateFile(path string) {
+	var _, err = os.Stat(path)
+
+	if os.IsNotExist(err) {
+		var file, err = os.Create(path)
+		util.CheckIfErrorDefault(err)
+		defer file.Close()
+	}
+}

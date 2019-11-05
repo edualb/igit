@@ -13,6 +13,12 @@ func CheckIfError(err error) {
 	}
 }
 
+func CheckIfErrorDefault(err error) {
+	if err != nil {
+		return
+	}
+}
+
 func ExecCommand(command string) error {
 	cmd := exec.Command("bash", "-c", command)
 	err := cmd.Run()

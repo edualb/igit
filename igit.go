@@ -49,8 +49,7 @@ func commands() {
 			Aliases:     []string{"sc"},
 			Description: "Store credentials from git",
 			Action: func(c *cli.Context) {
-				user := ""
-				pass := ""
+				var user, pass string
 				if c.NArg() > 1 {
 					user = c.Args()[0]
 					pass = c.Args()[1]
@@ -58,13 +57,18 @@ func commands() {
 					util.InfoWarning("You need to set your username and password.")
 					return
 				}
-				git.Store(user, pass)
-				password, err := git.GetPassword(user)
-				util.CheckIfError(err)
-				fmt.Println(fmt.Sprintf("password: %s", password))
+				storeCredential(user, pass)
 			},
 		},
 	}
+}
+
+func storeCredential(username, password string) {
+	auth := &git.Credentials{
+		Username: username,
+		Password: password,
+	}
+	auth.Store()
 }
 
 func release() {
