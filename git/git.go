@@ -18,11 +18,21 @@ func stash(path string) {
 	util.CheckIfError(err)
 }
 
-// TODO: Replace ExecCommand to go-git.v4 lib
-func pull(path string) {
+func pull(path, username, password string) {
 	util.Info("git pull")
-	err := util.ExecCommand(fmt.Sprintf("cd %s; git pull;", path))
-	util.CheckIfError(err)
+
+	w := getWorktree(path)
+
+	err := w.Pull(&git.PullOptions{
+		RemoteName: "origin",
+		Auth: &http.BasicAuth{
+			Username: username,
+			Password: password,
+		},
+	})
+	if err != nil && err != git.NoErrAlreadyUpToDate {
+		util.CheckIfError(err)
+	}
 }
 
 func push(path, username, password string) {

@@ -48,7 +48,7 @@ func (gitR *IGitRelease) Stash() {
 }
 
 func (gitR *IGitRelease) Pull() {
-	pull(gitR.Path)
+	pull(gitR.Path, gitR.c.Username, gitR.c.Password)
 }
 
 func (gitR *IGitRelease) CreateBranch() {
