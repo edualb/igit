@@ -2,6 +2,7 @@ package git
 
 import (
 	"fmt"
+	"os"
 	"time"
 
 	"github.com/edualb/igit/util"
@@ -11,11 +12,28 @@ import (
 	"gopkg.in/src-d/go-git.v4/plumbing/transport/http"
 )
 
-// TODO: Replace ExecCommand to go-git.v4 lib
+// TODO: Remove this function when it is not more necessary
 func stash(path string) {
 	util.Info("git stash")
 	err := util.ExecCommand(fmt.Sprintf("cd %s; git stash;", path))
 	util.CheckIfError(err)
+}
+
+// TODO: Get iGit path instead of set path in parameters
+func clone(url, path, username, password string) {
+	util.Info("git clone %s %s", url, path)
+
+	_, err := git.PlainClone(path, false, &git.CloneOptions{
+		Auth: &http.BasicAuth{
+			Username: username,
+			Password: password,
+		},
+		URL:      url,
+		Progress: os.Stdout,
+	})
+	if err != nil && err != git.ErrRepositoryAlreadyExists {
+		util.CheckIfError(err)
+	}
 }
 
 func pull(path, username, password string) {
