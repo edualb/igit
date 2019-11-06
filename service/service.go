@@ -9,6 +9,7 @@ import (
 	"github.com/edualb/igit/util"
 )
 
+// TODO: Send to IGitRelease
 func SetPodfileVersion(path, version string) {
 	input, err := ioutil.ReadFile(path)
 	util.CheckIfError(err)
@@ -44,7 +45,7 @@ func Mkdir(path string) {
 
 // SOURCE: https://gist.github.com/novalagung/13c5c8f4d30e0c4bff27
 func CreateFile(path string) {
-	var _, err = os.Stat(path)
+	_, err := os.Stat(path)
 
 	if os.IsNotExist(err) {
 		var file, err = os.Create(path)

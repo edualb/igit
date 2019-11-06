@@ -8,6 +8,7 @@ import (
 	"gopkg.in/src-d/go-git.v4"
 	"gopkg.in/src-d/go-git.v4/plumbing"
 	"gopkg.in/src-d/go-git.v4/plumbing/object"
+	"gopkg.in/src-d/go-git.v4/plumbing/transport/http"
 )
 
 // TODO: Replace ExecCommand to go-git.v4 lib
@@ -24,17 +25,18 @@ func pull(path string) {
 	util.CheckIfError(err)
 }
 
-// TODO: Replace ExecCommand to go-git.v4 lib
-func createRemoteBranch(path string, branch string) {
-	util.Info(fmt.Sprintf("git push --set-upstream origin %s", branch))
-	err := util.ExecCommand(fmt.Sprintf("cd %s; git push --set-upstream origin %s", path, branch))
-	util.CheckIfError(err)
-}
-
-// TODO: Replace ExecCommand to go-git.v4 lib
-func push(path string) {
+func push(path, username, password string) {
 	util.Info("git push")
-	err := util.ExecCommand(fmt.Sprintf("cd %s; git push", path))
+
+	r := getRepository(path)
+
+	err := r.Push(&git.PushOptions{
+		RemoteName: "origin",
+		Auth: &http.BasicAuth{
+			Username: username,
+			Password: password,
+		},
+	})
 	util.CheckIfError(err)
 }
 

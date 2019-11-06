@@ -82,11 +82,11 @@ func release() {
 	}
 
 	util.Info(fmt.Sprintf("* %s: ", os.Getenv("PROJECT_NAME")))
+	mainProject.SetAuth()
 	mainProject.Stash()
 	mainProject.Checkout()
 	mainProject.Pull()
 	mainProject.CreateBranch()
-	mainProject.CreateRemoteBranch()
 	service.SetPodfileVersion(os.Getenv("PATH_PODSPEC"), mainProject.Release)
 	mainProject.Add()
 	mainProject.Commit()
@@ -100,6 +100,7 @@ func release() {
 	}
 
 	util.Info("* PODS REPOSITORY:")
+	podsProject.SetAuth()
 	podsProject.Stash()
 	podsProject.Checkout()
 	podsProject.Pull()

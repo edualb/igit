@@ -1,7 +1,15 @@
 package git
 
 import (
+	"errors"
 	"fmt"
+	"os"
+	"os/user"
+
+	"github.com/edualb/igit/local"
+
+	"github.com/edualb/igit/util"
+	"github.com/joho/godotenv"
 )
 
 type IGitRelease struct {
@@ -9,6 +17,30 @@ type IGitRelease struct {
 	Release     string
 	BranchRef   string
 	PodspecFile string
+
+	c local.Credentials
+}
+
+// TODO: Refactor
+func (gitR *IGitRelease) SetAuth() {
+	usr, err := user.Current()
+	util.CheckIfError(err)
+	pathFile := fmt.Sprintf("%s/iGit/username.env", usr.HomeDir)
+	_, err = os.Stat(pathFile)
+
+	if err == nil {
+		err := godotenv.Load(pathFile)
+		util.CheckIfError(err)
+		gitR.c.Username = os.Getenv("USERNAME")
+		pass, err := gitR.c.GetPassword()
+		if len(pass) > 0 {
+			gitR.c.Password = pass
+		} else {
+			util.CheckIfError(errors.New("You need to set your credentials. Run $ igit store-credentials"))
+		}
+	} else {
+		util.CheckIfError(errors.New("You need to set your credentials. Run $ igit store-credentials"))
+	}
 }
 
 func (gitR *IGitRelease) Stash() {
@@ -23,10 +55,6 @@ func (gitR *IGitRelease) CreateBranch() {
 	createBranch(gitR.Path, fmt.Sprintf("release/%s", gitR.Release))
 }
 
-func (gitR *IGitRelease) CreateRemoteBranch() {
-	createRemoteBranch(gitR.Path, fmt.Sprintf("release/%s", gitR.Release))
-}
-
 func (gitR *IGitRelease) Checkout() {
 	checkout(gitR.Path, gitR.BranchRef)
 }
@@ -36,7 +64,7 @@ func (gitR *IGitRelease) Commit() {
 }
 
 func (gitR *IGitRelease) Push() {
-	push(gitR.Path)
+	push(gitR.Path, gitR.c.Username, gitR.c.Password)
 }
 
 func (gitR *IGitRelease) Add() {
