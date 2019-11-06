@@ -40,7 +40,7 @@ func push(path, username, password string) {
 	util.CheckIfError(err)
 }
 
-func checkout(path string, branch string) {
+func checkout(path, branch string) {
 	worktree := getWorktree(path)
 
 	util.Info(fmt.Sprintf("git checkout %s", branch))
@@ -51,7 +51,7 @@ func checkout(path string, branch string) {
 	util.CheckIfError(err)
 }
 
-func createBranch(path string, branch string) {
+func createBranch(path, branch string) {
 	r := getRepository(path)
 
 	headRef, err := r.Head()
@@ -71,7 +71,7 @@ func createBranch(path string, branch string) {
 	util.CheckIfError(err)
 }
 
-func add(path string, file string) {
+func add(path, file string) {
 	worktree := getWorktree(path)
 	util.Info(fmt.Sprintf("git add %s", file))
 	_, err := worktree.Add(file)
